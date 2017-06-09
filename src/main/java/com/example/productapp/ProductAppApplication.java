@@ -1,5 +1,11 @@
 package com.example.productapp;
 
+import java.security.Principal;
+import java.util.Arrays;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+
 import org.keycloak.adapters.KeycloakConfigResolver;
 import org.keycloak.adapters.springboot.KeycloakSpringBootConfigResolver;
 import org.keycloak.adapters.springsecurity.KeycloakSecurityComponents;
@@ -22,69 +28,62 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-
 @SpringBootApplication
 public class ProductAppApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(ProductAppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(ProductAppApplication.class, args);
+    }
 }
 
 @Controller
 class ProductController {
+    @GetMapping(path = "/products")
+    public String getProducts(Principal principal, Model model){
+       model.addAttribute("principal",principal);
+       model.addAttribute("products", Arrays.asList("iPad", "iPhone", "iPod"));
+       return "products";
+    }
 
-	@GetMapping(path = "/products")
-	public String getProducts(Model model){
-		model.addAttribute("products", Arrays.asList("iPad","iPhone","iPod"));
-		return "products";
-	}
-
-	@GetMapping(path = "/logout")
-	public String logout(HttpServletRequest request) throws ServletException {
-		request.logout();
-		return "/";
-	}
+    @GetMapping(path = "/logout")
+    public String logout(HttpServletRequest request) throws ServletException {
+        request.logout();
+        return "/";
+    }
 }
 
 @Configuration
 @EnableWebSecurity
 @ComponentScan(basePackageClasses = KeycloakSecurityComponents.class)
-class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter
-{
-	/**
-	 * Registers the KeycloakAuthenticationProvider with the authentication manager.
-	 */
-	@Autowired
-	public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-		KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
-		keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
-		auth.authenticationProvider(keycloakAuthenticationProvider);
-	}
+class SecurityConfig extends KeycloakWebSecurityConfigurerAdapter {
+    /**
+     * Registers the KeycloakAuthenticationProvider with the authentication
+     * manager.
+     */
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        KeycloakAuthenticationProvider keycloakAuthenticationProvider = keycloakAuthenticationProvider();
+        keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
+        auth.authenticationProvider(keycloakAuthenticationProvider);
+    }
 
-	/**
-	 * Defines the session authentication strategy.
-	 */
-	@Bean
-	@Override
-	protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
-		return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
-	}
+    /**
+     * Defines the session authentication strategy.
+     */
+    @Bean
+    @Override
+    protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
+        return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
+    }
 
-	@Bean
-	public KeycloakConfigResolver KeycloakConfigResolver() {return new KeycloakSpringBootConfigResolver();}
+    @Bean
+    public KeycloakConfigResolver KeycloakConfigResolver() {
+        return new KeycloakSpringBootConfigResolver();
+    }
 
-	@Override
-	protected void configure(HttpSecurity http) throws Exception
-	{
-		super.configure(http);
-		http
-				.authorizeRequests()
-				.antMatchers("/products*").hasRole("user")
-				.anyRequest().permitAll();
-	}
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        super.configure(http);
+        http.authorizeRequests().antMatchers("/products*").hasRole("user").anyRequest().permitAll();
+    }
 }
-
