@@ -35,6 +35,6 @@ TODO
 ## Resources
 
 * [Keycloak website](http://www.keycloak.org/)
-* [Spring Boot Keycloak Adapter Doc](https://keycloak.gitbooks.io/documentation/securing_apps/topics/oidc/java/spring-boot-adapter.html)
-* [Spring Security Keycloak Adapter](https://keycloak.gitbooks.io/documentation/securing_apps/topics/oidc/java/spring-security-adapter.html)
+* [Spring Boot Keycloak Adapter Doc](http://www.keycloak.org/docs/3.3/securing_apps/topics/oidc/java/spring-boot-adapter.html)
+* [Spring Security Keycloak Adapter](http://www.keycloak.org/docs/3.3/securing_apps/topics/oidc/java/spring-security-adapter.html)
 * [Keycloak quickstarts](https://github.com/keycloak/keycloak-quickstarts)
